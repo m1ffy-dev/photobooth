@@ -1,0 +1,101 @@
+:root {
+    --wine: #3a0a12;
+    --blanc: #ffffff;
+    --black: #000000;
+    --blush: #f5e6e8;
+}
+
+
+body {
+    background-color: var(--black);
+    color: var(--blush);
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    text-align: center;
+    margin: 0;
+    padding: 2rem 1rem 4rem;
+}
+
+body ::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(13, 5, 6, 0.82);
+    z-index: -1;
+}
+
+h1 {
+    font-family: 'Pinyon Script', cursive;
+    font-weight: 400;
+    font-size: 3rem;
+    margin: 0;
+    text-shadow: 0 0 18px var(--wine);
+}
+
+.booth {
+    position: relative;
+    max-width: 480px;
+    margin:1.5rem auto;
+    border: 6px solid var(--wine);
+    box-shadow: 0 0 30px rgba(139, 0, 0, 0.6);
+}
+
+video {
+    width: 100%;
+    display: block;
+    filter: grayscale(1) contrast(1.25) brightness(0.95);
+    transform: scaleX(-1);
+}
+
+
+#countdown {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Pinyon Script', cursive;
+    font-size: 9rem;
+    color: var(--blush);
+    text-shadow: 0 0 25px var(--wine);
+}
+
+.booth.flash::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: #fff;
+    opacity: 0.8;
+    z-index: 1;
+}
+
+#message { min-height: 1.5rem; margin: 0;}
+
+button {
+    font-family: inherit;
+    font-size: 1.2rem;
+    background: var(--wine);
+    color: var(--blush);
+    border: 1px solid var(--blush);
+    padding: 0.6rem 1.8rem;
+    cursor: pointer;
+    margin: 1rem;
+    letter-spacing: 0.08em;
+    transition: background 0.3s, color 0.3s;
+}
+
+button:hover:not(:disabled) { background: var(--blush); color: var(--black); }
+button:focus-visible { outline: 2px solid var(--blush); outline-offset: 3px; }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+#strip {
+  max-width: 100%;
+  display: block;
+  margin: 1rem auto;
+  box-shadow: 0 0 30px rgba(139, 0, 0, 0.6);
+}
+#strip[hidden], #downloadBtn[hidden] { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  button { transition: none; }
+}
