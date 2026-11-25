@@ -8,49 +8,10 @@ const downloadBtn = document.getElementById('downloadBtn');
 const strip = document.getElementById('strip');
 
 const SHOTS = 4;
-const SUPPORTS_FILTER = 'filter' in CanvasRenderingContext2D.prototype;
 let photos = [];
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-// ---------- leopard print (generated, tiles seamlessly) ----------
-function makeLeopard(size = 300) {
-  const c = document.createElement('canvas');
-  c.width = c.height = size;
-  const ctx = c.getContext('2d');
-  ctx.fillStyle = '#2a0509';
-  ctx.fillRect(0, 0, size, size);
-
-  for (let i = 0; i < 28; i++) {
-    const x = Math.random() * size;
-    const y = Math.random() * size;
-    const r = 10 + Math.random() * 10;
-    const rot = Math.random() * Math.PI * 2;
-    // draw at wrapped offsets so the tile repeats without seams
-    for (const dx of [-size, 0, size]) {
-      for (const dy of [-size, 0, size]) {
-        ctx.save();
-        ctx.translate(x + dx, y + dy);
-        ctx.rotate(rot);
-        ctx.fillStyle = '#6b0f1a';            // rosette centre
-        ctx.beginPath();
-        ctx.ellipse(0, 0, r, r * 0.75, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.strokeStyle = '#0d0506';          // black broken ring
-        ctx.lineWidth = r * 0.35;
-        ctx.beginPath();
-        ctx.arc(0, 0, r, 0.4, Math.PI * 1.6);
-        ctx.stroke();
-        ctx.restore();
-      }
-    }
-  }
-  return c;
-}
-
-const leopard = makeLeopard();
-document.body.style.backgroundImage = `url(${leopard.toDataURL()})`;
-document.body.style.backgroundSize = '300px';
 
 // ---------- webcam ----------
 async function startCamera() {
@@ -80,18 +41,6 @@ function capture() {
   ctx.filter = 'grayscale(1) contrast(1.25) brightness(0.95)';
   ctx.drawImage(video, 0, 0);
   ctx.restore();
-
-  // fallback for browsers without ctx.filter (some Safari versions)
-  if (!SUPPORTS_FILTER) {
-    const img = ctx.getImageData(0, 0, c.width, c.height);
-    const d = img.data;
-    for (let i = 0; i < d.length; i += 4) {
-      const g = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
-      d[i] = d[i + 1] = d[i + 2] = g;
-    }
-    ctx.putImageData(img, 0, 0);
-  }
-  return c;
 }
 
 // ---------- flash + countdown ----------
@@ -139,39 +88,44 @@ function drawCover(ctx, src, x, y, w, h) {
   ctx.drawImage(src, sx, sy, sw, sh, x, y, w, h);
 }
 
-async function buildStrip() {
+async function drawStrip() {
   await document.fonts.load('italic 22px "Cormorant Garamond"');
 
-  const W = 420;
-  const border = 14;                    // leopard border thickness
-  const pad = 26;                       // space around photos
+  const W = 360;
+  const pad = 24;                    
+  const gap = 14;                       
   const pw = W - pad * 2;
-  const ph = pw * 0.75;                 // 4:3 photos
+  const ph = pw ;                 
   const footer = 80;
-  const H = pad + photos.length * (ph + pad) + footer;
+  const photosEnd = pad + SHOTS * ph + (SHOTS  - 1) * gap;
+  const H = photosEnd + 58;
 
   strip.width = W;
   strip.height = H;
   const ctx = strip.getContext('2d');
 
-  // leopard border, then dark inner panel
-  ctx.fillStyle = ctx.createPattern(leopard, 'repeat');
+  // plain white strip background
+  ctx.fillStyle = '#fff';
   ctx.fillRect(0, 0, W, H);
-  ctx.fillStyle = '#0d0506';
-  ctx.fillRect(border, border, W - border * 2, H - border * 2);
 
-  // photos
-  photos.forEach((p, i) => drawCover(ctx, p, pad, pad + i * (ph + pad), pw, ph));
+  // photo slots (empty ones stay dark until filled)
+  for (let i = 0; i < SHOTS; i++) {
+    const y = pad + i * (ph + gap);
+    if (photos[i]) {
+      drawCover(ctx, photos[i], pad, y, pw, ph);
+    } else {
+      ctx.fillStyle = '#1a0508';
+      ctx.fillRect(pad, y, pw, ph);
+    }
+  }
 
-  // footer text
-  ctx.fillStyle = '#e8c9c9';
-  ctx.font = 'italic 22px "Cormorant Garamond"';
-  ctx.textAlign = 'center';
-  ctx.fillText(new Date().toLocaleDateString('en-AU'), W / 2, H - 38);
-
-  strip.hidden = false;
-  downloadBtn.hidden = false;
-  strip.scrollIntoView({ behavior: 'smooth', block: 'center' });
+// date once there's at least one photo
+  if (photos.length) {
+    ctx.fillStyle = '#1a0508';
+    ctx.font = 'italic 22px "Cormorant Garamond"';
+    ctx.textAlign = 'center';
+    ctx.fillText(new Date().toLocaleDateString('en-AU'), W / 2, photosEnd + 36);
+  }
 }
 
 // ---------- download ----------
@@ -184,4 +138,5 @@ downloadBtn.addEventListener('click', () => {
 
 // ---------- go ----------
 startBtn.addEventListener('click', runSession);
+drawStrip();          // show the empty strip straight away
 startCamera();

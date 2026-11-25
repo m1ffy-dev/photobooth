@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Photobooth</title>
+    <title>Candid Closet</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,19 +12,38 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Photobooth</h1>
-
-    <div class="booth" id="booth">
-        <video id="video" autoplay playsinline muted></video>
-        <div id="countdown"></div>
-    </div>
+    <header>
+        <h1>Candid Closet</h1>
+    </header>
 
 
-    <p id="message"></p>
-    <button id="startBtn">Strike a pose</button>
+    <!-- left side: booth -->
+    <main class="layout">
+        <section class="booth-col">
+        <div class="booth-wrap">
+            <div class="booth" id="booth">
+                <video id="video" autoplay playsinline muted></video>
+                <canvas id="lace" width="600" height="600"></canvas>
+                <div id="countdown"></div>
+            </div>
+        </div>
+            <img class="lily lily-top" src="assets/lily-top.png" alt="" onerror="this.remove()">
+            <img class="lily lily-bottom" src="assets/lily-bottom.png" alt="" onerror="this.remove()">
+        <p id="message"></p>
+        <button id="startBtn">Strike a pose</button>
+        </section>
 
-    <canvas id="strip" hidden></canvas>
-    <button id="downloadBtn" hidden>Download</button>
+    <!-- right side: photo strip -->
+    <section class="strip-col">
+       <div class="strip-wrap">
+        <canvas id="strip"></canvas>
+        <img class="lily lily-top" src="assets/lily-top.png" alt="" onerror="this.remove()">
+        <img class="lily lily-bottom" src="assets/lily-bottom.png" alt="" onerror="this.remove()">
+        
+       </div>
+       <button id="downloadBtn">Download</button>
+    </section>
+</main>
 
     <script src="script.js"></script>
 </body>
